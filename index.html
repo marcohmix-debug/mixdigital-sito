@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MixDigital · Prima lo vedi, poi decidi</title>
+<meta name="description" content="Siti su misura per negozi, saloni e trattorie in tutta Italia. Scrivi il nome della tua attività e guarda il tuo sito prendere forma. La bozza vera arriva gratis in 48 ore.">
+<link rel="canonical" href="https://mixdigital.it/">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#0c0c0d">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mixdigital.it/">
+<meta property="og:title" content="MixDigital · Prima lo vedi, poi decidi">
+<meta property="og:description" content="Siti su misura per attività in tutta Italia. Bozza gratuita in 48 ore.">
+<meta property="og:image" content="https://mixdigital.it/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="fonts/bricolage.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="sc/scrollcraft.css">
+<noscript><style>[data-sc-in],[data-sc-stagger]>*,[data-sc-cue]{opacity:1!important;transform:none!important}[data-sc-reveal]{clip-path:none!important}.build{--b:1}</style></noscript>
+<style>
+  @font-face { font-family: "Bricolage"; src: url(fonts/bricolage.woff2) format("woff2"); font-weight: 400 800; font-display: swap; }
+  @font-face { font-family: "Manrope"; src: url(fonts/manrope.woff2) format("woff2"); font-weight: 400 700; font-display: swap; }
+
+  :root {
+    --sc-canvas: #0c0c0d;
+    --sc-surface: #18181b;
+    --sc-ink: #f2f1ee;
+    --sc-ink-soft: #b7b4ac;
+    --sc-accent: #e1ac10;
+    --sc-accent-ink: #0c0c0d;
+    --sc-font-display: "Bricolage", "Manrope", sans-serif;
+    --sc-font-text: "Manrope", system-ui, sans-serif;
+    --sc-shadow-color: 240 10% 2%;
+
+    --today: #19191c;          /* il lato "oggi": grigio, piatto, fermo */
+    --today-ink: #c9c7c1;
+    --blue: #24338f;
+    --split: .5;               /* posizione del divisorio, 0..1 */
+    --col: clamp(24px, 4vw, 72px);
+  }
+  body { background: var(--sc-canvas); }
+  h1, h2, h3 { font-family: var(--sc-font-display); font-weight: 720; letter-spacing: -0.035em; line-height: .98; margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  .skip { position: absolute; left: -999px; }
+  .skip:focus { left: 16px; top: 12px; z-index: 50; background: var(--sc-accent); color: var(--sc-accent-ink); padding: 10px 16px; border-radius: 10px; }
+
+  /* ---------------- il fondo: due mondi e il divisorio ---------------- */
+  .g-today { position: fixed; inset: 0 auto 0 0; width: 100vw; z-index: -2; background: var(--today); transform: scaleX(var(--split)); transform-origin: 0 50%; }
+  #alive { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -3; background: var(--sc-canvas); }
+  .divider { position: fixed; top: 0; bottom: 0; left: calc(var(--split) * 100%); width: 0; z-index: 20; pointer-events: none; }
+  .divider::before { content: ""; position: absolute; top: 0; bottom: 0; left: -1px; width: 2px; background: color-mix(in oklab, var(--sc-ink) 16%, transparent); }
+  .divider i { position: absolute; top: 0; left: -1px; width: 2px; height: 100%; background: var(--sc-accent); transform-origin: 50% 0; transform: scaleY(var(--prog, 0)); }
+  .divider .lab { position: absolute; top: 22px; white-space: nowrap; font-weight: 700; font-size: 14px; letter-spacing: .01em; }
+  .divider .lab--l { right: 14px; color: var(--today-ink); background: #232327; padding: 9px 16px; border-radius: 999px; }
+  .divider .lab--r { left: 14px; color: var(--sc-ink); display: flex; align-items: center; gap: 14px; background: color-mix(in oklab, var(--sc-canvas) 86%, transparent); padding: 6px 6px 6px 16px; border-radius: 999px; box-shadow: var(--sc-e1); }
+  .divider .lab--r img { width: 74px; height: auto; }
+  .divider a { pointer-events: auto; }
+  .divider .mini { background: var(--sc-accent); color: var(--sc-accent-ink); text-decoration: none; padding: 9px 16px; border-radius: 999px; font-size: 14px; transition: transform var(--sc-d-fast) var(--sc-ease-out), background-color var(--sc-d-fast) var(--sc-ease-out); }
+  .divider .mini:hover { background: var(--sc-ink); }
+  .divider .mini:active { transform: scale(.97); }
+
+  /* ---------------- righe a due colonne ---------------- */
+  .row { display: grid; grid-template-columns: 1fr 1fr; }
+  .L, .R { padding: 0 var(--col); position: relative; }
+  .L { color: var(--today-ink); }
+  .tag { display: none; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 12px; min-height: 54px; padding: 0 26px; border: 0; border-radius: 999px;
+    background: var(--sc-accent); color: var(--sc-accent-ink); font: 700 16px/1 var(--sc-font-text); text-decoration: none; cursor: pointer; white-space: nowrap;
+    box-shadow: var(--sc-e2);
+    transition: transform var(--sc-d-fast) var(--sc-ease-out), background-color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .btn span { transition: transform var(--sc-d-base) var(--sc-ease-out); }
+  @media (hover: hover) and (pointer: fine) { .btn:hover { background: var(--sc-ink); } .btn:hover span { transform: translateX(4px); } }
+  .btn:active { transform: scale(.97); }
+  .btn--ghost { background: transparent; color: var(--sc-ink); box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--sc-ink) 70%, transparent); }
+  @media (hover: hover) and (pointer: fine) { .btn--ghost:hover { background: var(--sc-ink); color: var(--sc-accent-ink); } }
+
+  /* ---------------- 1. apertura ---------------- */
+  .hero { min-height: 100svh; align-items: center; padding: 96px 0 64px; }
+  .hero .L h2 { font-size: clamp(30px, 3.4vw, 56px); color: var(--sc-ink); max-width: 11em; }
+  .hero .L .note { margin-top: 16px; max-width: 34ch; }
+  .serp { margin-top: 40px; max-width: 520px; background: #212125; border-radius: 18px; padding: 22px; box-shadow: var(--sc-e1); }
+  .serp .q { display: flex; align-items: center; gap: 12px; background: #2b2b30; border-radius: 999px; padding: 12px 18px; color: var(--sc-ink); font-weight: 600; }
+  .serp .q svg { width: 18px; height: 18px; flex: none; }
+  .serp .res { margin-top: 20px; padding-top: 4px; }
+  .serp .res small { display: block; font-size: 13px; color: #9e9b94; }
+  .serp .res b { display: block; font-size: 20px; color: #a9b6ff; font-weight: 600; margin: 4px 0; text-decoration: underline; text-underline-offset: .2em; text-decoration-thickness: 1px; }
+  .serp .res p { font-size: 15px; }
+  .serp .miss { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .serp .miss span { font-size: 13px; padding: 6px 12px; border-radius: 999px; background: #2b2b30; color: #c9c7c1; }
+  .serp .miss span s { text-decoration-thickness: 1px; }
+  .cap { margin-top: 12px; font-size: 13px; color: #8f8c86; }
+
+  .hero .R { min-height: 78svh; display: grid; align-content: center; grid-template-columns: minmax(0, 1fr) minmax(190px, 290px); column-gap: clamp(20px, 2.4vw, 40px); }
+  .hero .R > h1, .hero .R > .lede { grid-column: 1 / -1; }
+  .hero .R > .namer { grid-column: 1; align-self: start; }
+  .hero h1 { font-size: clamp(44px, 5.2vw, 96px); max-width: 7.4em; }
+  .hero .lede { margin-top: 22px; max-width: 30ch; font-size: clamp(18px, 1.45vw, 22px); line-height: 1.45; color: var(--sc-ink); }
+  .namer { margin-top: 32px; max-width: 460px; }
+  .namer label { display: block; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+  .namer .field { display: flex; gap: 10px; flex-wrap: wrap; }
+  .namer input {
+    flex: 1 1 220px; min-height: 54px; padding: 0 20px; border-radius: 999px; border: 0;
+    background: color-mix(in oklab, var(--sc-canvas) 72%, transparent); color: var(--sc-ink);
+    box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--sc-ink) 30%, transparent); font-size: 17px;
+    transition: box-shadow var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .namer input::placeholder { color: #a8a59d; }
+  .namer input:focus { box-shadow: inset 0 0 0 2px var(--sc-accent); outline: none; }
+  .cats { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .cats button { border: 0; border-radius: 999px; padding: 10px 16px; font-size: 14px; font-weight: 700; cursor: pointer; color: var(--sc-ink); background: color-mix(in oklab, var(--sc-ink) 12%, transparent); transition: background-color var(--sc-d-fast) var(--sc-ease-out); }
+  .cats button[aria-pressed="true"] { background: var(--sc-ink); color: var(--sc-accent-ink); }
+  .cats button:active { transform: scale(.97); }
+
+  /* i piani dell'apertura (solo sul lato vivo) */
+  .scene { position: relative; grid-column: 2; grid-row: 3; margin-top: 30px; width: 100%; aspect-ratio: 4 / 5; pointer-events: none; }
+  .win { position: absolute; inset: 0; border-radius: 22px; overflow: hidden; background: #f6f2ea; color: #1b1b1b; box-shadow: var(--sc-e3); }
+  .win .bar { display: flex; gap: 6px; padding: 12px 14px; background: #e9e3d8; }
+  .win .bar i { width: 9px; height: 9px; border-radius: 50%; background: #c9c0b1; }
+  .win .bar em { margin-left: 8px; font-style: normal; font-size: 11px; color: #6c6559; }
+  .win .w-hero { position: relative; height: 56%; overflow: hidden; }
+  .win .w-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .win .w-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgb(15 12 10 / .78), rgb(15 12 10 / .05) 70%); }
+  .win .w-hero div { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1; color: #fff; }
+  .win .w-hero b { display: block; font: 750 26px/1 var(--sc-font-display); letter-spacing: -0.03em; overflow-wrap: anywhere; }
+  .win .w-hero small { display: block; margin-top: 6px; font-size: 12px; opacity: .92; }
+  .win .w-body { padding: 14px 16px; display: grid; gap: 8px; font-size: 12px; }
+  .win .w-body span { height: 8px; border-radius: 4px; background: #e2dbcf; }
+  .win .w-body span:nth-child(2) { width: 70%; }
+  .chip { position: absolute; display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 999px; background: #fff; color: #17171a; font-size: 13px; font-weight: 700; box-shadow: var(--sc-e2); white-space: nowrap; }
+  .chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--sc-accent); }
+  .chip--a { left: -18%; top: 18%; }
+  .chip--b { right: -10%; top: 46%; }
+  .chip--c { left: -8%; bottom: 8%; background: var(--sc-accent); }
+
+  /* ---------------- 2. il picco: il telefono si costruisce ---------------- */
+  .peak .row { height: 100%; align-items: center; }
+  .peak .L { display: grid; }
+  .peak .L > div { grid-area: 1 / 1; }
+  .peak .L h2 { font-size: clamp(30px, 3.4vw, 56px); color: var(--sc-ink); max-width: 10em; }
+  .peak .L p { margin-top: 14px; max-width: 34ch; }
+  .peak .R { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: clamp(20px, 3vw, 56px); }
+  .peak .R h2 { font-size: clamp(34px, 3.8vw, 64px); max-width: 6.5em; }
+  .peak .R .after { margin-top: 18px; max-width: 26ch; color: var(--sc-ink); }
+
+  .phone { width: clamp(230px, 20vw, 300px); aspect-ratio: 9 / 19; border-radius: 40px; padding: 10px; background: #050506; box-shadow: var(--sc-e3), var(--sc-edge); }
+  .screen { position: relative; height: 100%; border-radius: 31px; overflow: hidden; background: #f6f2ea; color: #1b1b1b; font-size: 12px; }
+  /* --b e' l'avanzamento della costruzione, 0..1, preso dall'atto */
+  .build { --b: var(--sc-p, 0); }
+  .st { position: absolute; inset: 0; }
+  .s-top { display: flex; justify-content: space-between; align-items: center; padding: 30px 18px 12px; font-weight: 800; font-size: 13px; }
+  .s-top i { width: 18px; height: 8px; border-block: 2px solid currentColor; }
+  .s-top span { opacity: clamp(0, calc((var(--b) - .06) * 8), 1); }
+  .sk { display: grid; gap: 10px; padding: 0 14px; }
+  .sk span { height: 12px; border-radius: 6px; background: #e3dccf; }
+  .s-hero { position: relative; margin: 0 12px; height: 210px; border-radius: 18px; overflow: hidden; background: #e3dccf; }
+  .s-hero .paint { position: absolute; inset: 0; background: var(--cat-color, #7a3e1d); opacity: clamp(0, calc((var(--b) - .26) * 6), 1); }
+  .s-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(calc((1 - clamp(0, calc((var(--b) - .44) * 5), 1)) * 100%) 0 0 0); }
+  .s-hero .shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgb(12 10 8 / .8), transparent 70%); opacity: clamp(0, calc((var(--b) - .5) * 6), 1); }
+  .s-hero .txt { position: absolute; left: 14px; right: 14px; bottom: 14px; color: #fff; opacity: clamp(0, calc((var(--b) - .32) * 7), 1); }
+  .s-hero b { display: block; font: 750 24px/1 var(--sc-font-display); letter-spacing: -0.03em; overflow-wrap: anywhere; }
+  .s-hero small { display: block; margin-top: 6px; opacity: .92; }
+  .s-act { margin: 12px; display: grid; gap: 8px; opacity: clamp(0, calc((var(--b) - .62) * 6), 1); transform: translateY(calc((1 - clamp(0, calc((var(--b) - .62) * 6), 1)) * 10px)); }
+  .s-act .pren { padding: 12px; border-radius: 12px; text-align: center; font-weight: 800; background: var(--sc-accent); color: #111; }
+  .s-act .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .s-act .two div { background: #ebe4d7; border-radius: 12px; padding: 10px; line-height: 1.3; }
+  .s-act strong { display: block; }
+  .s-live { position: absolute; left: 50%; bottom: 18px; transform: translate(-50%, calc((1 - clamp(0, calc((var(--b) - .84) * 7), 1)) * 16px)); opacity: clamp(0, calc((var(--b) - .84) * 7), 1); display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; background: #111; color: #fff; padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: 11px; }
+  .s-live i { width: 8px; height: 8px; border-radius: 50%; background: #3ccf6e; }
+
+  /* ---------------- 3. di solito / con noi ---------------- */
+  .calm { padding: clamp(96px, 12vw, 180px) 0; align-items: start; }
+  .calm h2 { font-size: clamp(34px, 4vw, 68px); }
+  .calm .L h2 { color: var(--today-ink); }
+  .calm ul { list-style: none; padding: 0; margin: 36px 0 0; display: grid; gap: 22px; }
+  .calm li { font-size: clamp(19px, 1.6vw, 25px); line-height: 1.35; font-family: var(--sc-font-display); font-weight: 560; letter-spacing: -0.015em; max-width: 24ch; }
+  .calm .L li { color: #a4a19a; }
+  .calm .L li s { text-decoration-thickness: 2px; text-decoration-color: color-mix(in oklab, var(--today-ink) 50%, transparent); }
+  .calm .R li { color: var(--sc-ink); }
+  .calm .R li b { color: var(--sc-accent); font-weight: 650; }
+
+  /* ---------------- 4. cosa cambia ---------------- */
+  .change { padding: 0 0 clamp(96px, 12vw, 180px); align-items: start; }
+  .change .L { position: sticky; top: 30vh; }
+  .change .L h2 { font-size: clamp(30px, 3.4vw, 56px); color: var(--sc-ink); max-width: 9em; }
+  .change .L p { margin-top: 16px; max-width: 32ch; }
+  .rows { display: grid; gap: clamp(64px, 8vw, 120px); }
+  .rows article { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .rows figure { margin: 0; overflow: hidden; border-radius: 22px; box-shadow: var(--sc-e2); }
+  .rows figure img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; transform: scale(1.12); }
+  .rows article:nth-child(2) figure { width: 78%; margin-left: auto; }
+  .rows article:nth-child(3) figure { width: 64%; }
+  .rows h3 { font-size: clamp(24px, 2.2vw, 36px); line-height: 1.05; }
+  .rows p { margin-top: 10px; max-width: 38ch; color: var(--sc-ink-soft); }
+
+  /* ---------------- 5. domande ---------------- */
+  .faq { padding-bottom: clamp(96px, 12vw, 180px); }
+  .faq .head { padding: 0 0 48px; }
+  .faq .head h2 { font-size: clamp(34px, 4vw, 68px); }
+  .faq .head .L h2 { color: var(--today-ink); }
+  .faq dl { margin: 0; }
+  .faq .pair { display: grid; grid-template-columns: 1fr 1fr; padding-block: 28px; }
+  .faq dt { padding: 0 var(--col); font: 650 clamp(20px, 1.7vw, 28px)/1.15 var(--sc-font-display); letter-spacing: -0.02em; color: var(--sc-ink); }
+  .faq dd { margin: 0; padding: 0 var(--col); max-width: calc(42ch + 2 * var(--col)); color: var(--sc-ink); }
+
+  /* ---------------- 6. chiusura: il divisorio collassa ---------------- */
+  .close .stage { position: relative; height: 100%; }
+  .close .L { position: absolute; left: 0; top: 0; bottom: 0; width: 50%; display: grid; align-content: center; opacity: calc(var(--split) * 2); }
+  .close .L h2 { font-size: clamp(30px, 3.4vw, 56px); color: var(--today-ink); }
+  .close .R { position: absolute; left: 50%; top: 0; bottom: 0; width: 50%; display: grid; align-content: center; transform: translateX(calc((var(--split) - .5) * 100vw)); }
+  .close h2.big { font-size: clamp(48px, 6vw, 112px); max-width: 7em; }
+  .close .who { margin-top: 22px; font-size: clamp(19px, 1.5vw, 24px); max-width: 28ch; }
+  .close .who b { color: var(--sc-accent); font-weight: 700; }
+  .close .acts { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .close .copied { min-height: 1.5em; margin-top: 12px; font-size: 15px; font-weight: 600; color: var(--sc-accent); }
+  .close .fin { position: absolute; right: clamp(24px, 6vw, 110px); top: 50%; translate: 0 -50%; opacity: calc(1 - var(--split) * 2); transform: translateX(calc(var(--split) * 30vw)) rotate(calc(var(--split) * 10deg)); }
+  .close .fin .phone { --b: 1; }
+  .foot { position: absolute; left: var(--col); right: var(--col); bottom: 18px; display: flex; flex-wrap: wrap; gap: 8px 28px; justify-content: space-between; font-size: 14px; color: var(--sc-ink-soft); }
+  .foot a { color: var(--sc-ink); }
+
+  /* ---------------- telefono e tablet: le due meta' si impilano ---------------- */
+  @media (max-width: 860px) {
+    :root { --split: 0 !important; --col: 20px; }
+    .g-today, .divider { display: none; }
+    .row, .faq .pair { grid-template-columns: 1fr; }
+    .L { background: var(--today); border-radius: 22px; margin: 0 12px; padding: 22px 18px; }
+    .tag { display: block; font-size: 13px; font-weight: 800; margin-bottom: 12px; }
+    .L .tag { color: var(--today-ink); }
+    .R .tag { color: var(--sc-accent); }
+    .mbar { display: flex !important; }
+    .hero { padding: 76px 0 40px; gap: 28px; }
+    .hero .R { order: -1; min-height: 0; }
+    .hero .R { grid-template-columns: 1fr; }
+    .scene { grid-column: 1; grid-row: auto; width: 74%; margin: 36px 0 0 auto; }
+    .chip--a { left: -26%; } .chip--b { right: -4%; }
+    .peak .row { align-content: center; gap: 18px; }
+    .peak .L { margin: 0 12px; padding: 16px 18px; }
+    .peak .L h2 { font-size: 24px; }
+    .peak .L p { font-size: 15px; margin-top: 8px; }
+    .peak .R { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+    .peak .R h2 { font-size: 30px; max-width: none; }
+    .peak .R .after { display: none; }
+    .phone { width: min(178px, 46vw); }
+    .calm { padding: 72px 0; gap: 20px; }
+    .change { gap: 32px; }
+    .change .L { position: static; }
+    .faq dt, .faq dd { padding: 0 20px; }
+    .faq dd { margin-top: 10px; }
+    .faq .pair { padding-block: 22px; }
+    .faq .head .L { display: none; }
+    .close .L { display: none; }
+    .close .R { position: absolute; left: 0; width: 100%; transform: none; padding: 0 20px 90px; }
+    .close .fin { display: none; }
+    .foot { left: 20px; right: 20px; }
+  }
+  .mbar { display: none; position: absolute; top: 0; left: 0; right: 0; z-index: 10; justify-content: space-between; align-items: center; padding: 16px 20px; }
+  .mbar img { width: 96px; height: auto; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rows figure img { transform: none; }
+    .btn, .btn span, .cats button { transition: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="alive" aria-hidden="true"></canvas>
+<div class="g-today" aria-hidden="true"></div>
+<div class="sc-grain" aria-hidden="true"></div>
+<a class="skip" href="#main">Vai al contenuto</a>
+
+<div class="divider">
+  <i></i>
+  <span class="lab lab--l" aria-hidden="true">Oggi</span>
+  <span class="lab lab--r"><img src="assets/logo-chiaro.png" width="546" height="190" alt="MixDigital"><a class="mini" data-mail href="mailto:info@mixdigital.it">Voglio la bozza</a></span>
+</div>
+
+<main id="main">
+
+  <!-- 1 · APERTURA: flow, piani in parallasse solo sul lato vivo -->
+  <section class="row hero" data-sc-act="flow" aria-labelledby="t1">
+    <div class="mbar"><img src="assets/logo-chiaro.png" width="546" height="190" alt="MixDigital"><a class="btn" data-mail href="mailto:info@mixdigital.it" style="min-height:44px;padding:0 18px;font-size:14px">Voglio la bozza</a></div>
+    <div class="L">
+      <p class="tag">Oggi</p>
+      <h2>Ti cercano. Trovano questo.</h2>
+      <p class="note">Un cliente nuovo cerca il tuo mestiere in zona, dal telefono, alle nove di sera.</p>
+      <div class="serp" aria-label="Esempio di risultato di ricerca di oggi">
+        <div class="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span data-q>parrucchiere vicino a me</span></div>
+        <div class="res">
+          <small>instagram.com › <span data-handle>latuaattivita</span></small>
+          <b data-name>La tua attività</b>
+          <p>Profilo Instagram. Post, storie, nessun orario.</p>
+          <div class="miss"><span><s>Sito web</s></span><span><s>Prenota</s></span><span><s>Orari</s></span></div>
+        </div>
+      </div>
+      <p class="cap">Esempio di ricerca, ricostruito.</p>
+    </div>
+    <div class="R">
+      <h1 id="t1">Prima lo vedi, poi decidi.</h1>
+      <p class="lede">Siti su misura per negozi, saloni e trattorie, in tutta Italia. Scrivi il nome della tua attività e guarda.</p>
+      <div class="namer">
+        <label for="f-name">Come si chiama la tua attività?</label>
+        <div class="field">
+          <input id="f-name" type="text" autocomplete="organization" maxlength="36" placeholder="Es. Salone Aurora">
+        </div>
+        <div class="cats" role="group" aria-label="Tipo di attività">
+          <button type="button" data-cat="parrucchiere" aria-pressed="true">Parrucchiere</button>
+          <button type="button" data-cat="trattoria" aria-pressed="false">Trattoria</button>
+          <button type="button" data-cat="forno" aria-pressed="false">Forno</button>
+        </div>
+      </div>
+      <div class="scene" aria-hidden="true">
+        <div data-sc-parallax="-0.5" style="position:absolute;inset:0">
+          <div class="win" data-sc-tilt="6">
+            <div class="bar"><i></i><i></i><i></i><em data-url>latuaattivita.it</em></div>
+            <div class="w-hero"><img data-cat-img src="assets/foto/parrucchiera.jpg" width="1400" height="933" alt=""><div><b data-name>La tua attività</b><small data-claim>Tagli, colore e piega su appuntamento</small></div></div>
+            <div class="w-body"><span></span><span></span></div>
+          </div>
+        </div>
+        <span class="chip chip--a" data-sc-parallax="0.9"><i></i>Prenota online</span>
+        <span class="chip chip--b" data-sc-parallax="1.4"><i></i>Aperto ora</span>
+        <span class="chip chip--c" data-sc-parallax="0.6">Su Google</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · IL PICCO: pin, il telefono si costruisce sotto la mano -->
+  <section class="peak" data-sc-act="pin" data-sc-span="3.2" aria-labelledby="t2">
+    <div data-sc-stage>
+      <div class="row">
+        <div class="L">
+          <div data-sc-cue="0 0.36 0"><p class="tag">Oggi</p><h2>Un profilo Instagram, e basta.</h2><p>Chi non ti segue non trova orari, servizi e indirizzo in un posto solo.</p></div>
+          <div data-sc-cue="0.3 0.68"><p class="tag">Oggi</p><h2>Un sito fermo da anni.</h2><p>Dal telefono non si legge e il browser lo segnala come non sicuro.</p></div>
+          <div data-sc-cue="0.62 1"><p class="tag">Oggi</p><h2>Un numero che squilla a vuoto.</h2><p>Sei con un cliente e non rispondi. Chi chiama a vuoto, di solito, non richiama.</p></div>
+        </div>
+        <div class="R">
+          <div>
+            <h2 id="t2" data-sc-cue="0 1 0 0" data-sc-kinetic="lines">Il tuo sito, mentre scorri.</h2>
+            <p class="after" data-sc-cue="0.72 1 0.08 0.04">Questa è solo la prima schermata. La bozza vera, con i tuoi colori e i tuoi servizi, arriva in 48 ore.</p>
+          </div>
+          <div class="phone build" data-sc-tilt="5" aria-hidden="true">
+            <div class="screen">
+              <div class="s-top"><span data-name>La tua attività</span><i></i></div>
+              <div class="s-hero">
+                <div class="paint"></div>
+                <img data-cat-img src="assets/foto/parrucchiera.jpg" width="1400" height="933" alt="">
+                <div class="shade"></div>
+                <div class="txt"><b data-name>La tua attività</b><small data-claim>Tagli, colore e piega su appuntamento</small></div>
+              </div>
+              <div class="sk" style="margin-top:14px"><span></span><span style="width:72%"></span></div>
+              <div class="s-act">
+                <div class="pren" data-cta>Prenota online</div>
+                <div class="two"><div><strong>Dove</strong><span data-zona>La tua città</span></div><div><strong data-k>Orari</strong><span data-v>mar-sab 9-19</span></div></div>
+              </div>
+              <div class="s-live"><i></i>Online</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · SOLLIEVO: reveal, un wipe per lato -->
+  <section class="row calm" data-sc-act="flow" aria-labelledby="t3">
+    <div class="L" data-sc-reveal="down" data-sc-reveal-at="0.12 0.42">
+      <p class="tag">Di solito</p>
+      <h2>Di solito.</h2>
+      <ul>
+        <li><s>Preventivi da decifrare.</s></li>
+        <li><s>Un anticipo prima di vedere qualcosa.</s></li>
+        <li><s>Settimane di attesa e di telefonate.</s></li>
+      </ul>
+    </div>
+    <div class="R" data-sc-reveal="up" data-sc-reveal-at="0.18 0.5">
+      <p class="tag">Con noi</p>
+      <h2 id="t3">Con noi.</h2>
+      <ul>
+        <li>La bozza in <b>48 ore</b>, gratis.</li>
+        <li>La sistemiamo insieme, finché non ti ci ritrovi.</li>
+        <li>Va online col tuo nome .it, e da lì ci pensiamo noi.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4 · DESIDERIO: foto in parallasse sul lato vivo -->
+  <section class="row change" data-sc-act="flow" aria-labelledby="t4">
+    <div class="L" data-sc-in>
+      <p class="tag">Oggi</p>
+      <h2>La sera trovano la serranda abbassata.</h2>
+      <p>Il negozio è chiuso, ma il telefono dei clienti no. Il sito lavora quando tu non ci sei.</p>
+    </div>
+    <div class="R">
+      <p class="tag">Con MixDigital</p>
+      <div class="rows">
+        <article data-sc-in>
+          <figure><img data-sc-parallax="0.6" src="assets/foto/barbiere.jpg" width="1400" height="933" alt="Un barbiere prepara gli attrezzi prima di aprire" loading="lazy"></figure>
+          <div><h3 id="t4">Ti trovano su Google.</h3><p>Nome, orari, servizi e indirizzo in un posto solo, collegati alla tua scheda Google.</p></div>
+        </article>
+        <article data-sc-in>
+          <figure><img data-sc-parallax="0.6" src="assets/foto/telefono.jpg" width="1400" height="933" alt="Un fornaio controlla le prenotazioni sul telefono" loading="lazy"></figure>
+          <div><h3>Prenotano anche quando sei chiuso.</h3><p>Un calendario online o un pulsante WhatsApp: i clienti prenotano da soli.</p></div>
+        </article>
+        <article data-sc-in>
+          <figure><img data-sc-parallax="0.6" src="assets/foto/trattoria.jpg" width="935" height="1400" alt="Una cameriera prende un'ordinazione tra i tavoli all'aperto" loading="lazy" style="aspect-ratio:4/5"></figure>
+          <div><h3>Perfetto sul telefono.</h3><p>Veloce e leggibile dallo smartphone, dove arriva la maggior parte dei clienti.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · FIDUCIA: domande a sinistra, risposte a destra -->
+  <section class="faq" data-sc-act="flow" aria-labelledby="t5">
+    <div class="row head">
+      <div class="L"><h2>Le domande.</h2></div>
+      <div class="R"><h2 id="t5">Le risposte.</h2></div>
+    </div>
+    <dl data-sc-in data-sc-stagger="60">
+      <div class="pair"><dt>Quanto costa?</dt><dd>Un canone fisso che comprende tutto: sito, dominio, hosting, modifiche e assistenza. Te lo diciamo insieme alla bozza. Niente anticipi e niente da firmare prima.</dd></div>
+      <div class="pair"><dt>La bozza è davvero gratis?</dt><dd>Sì. Te la prepariamo e te la mostriamo senza chiederti un centesimo. Se non ti convince, finisce lì.</dd></div>
+      <div class="pair"><dt>Lavorate anche nella mia città?</dt><dd>Sì, in tutta Italia. Facciamo tutto a distanza: ci scrivi, ti mandiamo la bozza, la sistemiamo insieme al telefono o per email.</dd></div>
+      <div class="pair"><dt>Devo preparare testi e foto?</dt><dd>No. Partiamo da social, recensioni e scheda Google. Se vuoi aggiungere foto o testi tuoi, li inseriamo noi.</dd></div>
+      <div class="pair"><dt>Il dominio è mio?</dt><dd>Sì, è intestato alla tua attività. Se un giorno cambi fornitore, te lo porti via.</dd></div>
+      <div class="pair"><dt>Chi siete?</dt><dd>Un piccolo studio italiano che fa solo siti per attività di quartiere. Niente call center: ti risponde chi il sito lo fa.</dd></div>
+    </dl>
+  </section>
+
+  <!-- 6 · DECISIONE: pin corto, il divisorio va al bordo e resta il lato vivo -->
+  <section class="close" data-sc-act="pin" data-sc-span="1.5" aria-labelledby="t6">
+    <div data-sc-stage>
+      <div class="stage">
+        <div class="L"><div style="padding:0 var(--col)"><h2>Oggi resta così.</h2></div></div>
+        <div class="R">
+          <div style="padding:0 var(--col)">
+            <h2 class="big" id="t6">Vuoi vedere la tua bozza?</h2>
+            <p class="who">La bozza di <b data-name>la tua attività</b> in 48 ore, gratis. Ti risponde una persona.</p>
+            <div class="acts">
+              <a class="btn" data-mail href="mailto:info@mixdigital.it">Voglio la bozza <span aria-hidden="true">→</span></a>
+              <button class="btn btn--ghost" type="button" data-copy>Copia l'indirizzo email</button>
+            </div>
+            <p class="copied" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+        <div class="fin" aria-hidden="true">
+          <div class="phone build">
+            <div class="screen">
+              <div class="s-top"><span data-name>La tua attività</span><i></i></div>
+              <div class="s-hero"><div class="paint"></div><img data-cat-img src="assets/foto/parrucchiera.jpg" width="1400" height="933" alt=""><div class="shade"></div><div class="txt"><b data-name>La tua attività</b><small data-claim>Tagli, colore e piega su appuntamento</small></div></div>
+              <div class="sk" style="margin-top:14px"><span></span><span style="width:72%"></span></div>
+              <div class="s-act"><div class="pren" data-cta>Prenota online</div><div class="two"><div><strong>Dove</strong><span data-zona>La tua città</span></div><div><strong data-k>Orari</strong><span data-v>mar-sab 9-19</span></div></div></div>
+              <div class="s-live"><i></i>Online</div>
+            </div>
+          </div>
+        </div>
+        <footer class="foot">
+          <span>© <span id="anno">2026</span> MixDigital · siti su misura in tutta Italia</span>
+          <span><a href="privacy.html">Privacy</a> · nessun cookie</span>
+        </footer>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="sc/scrollcraft.js"></script>
+<script>
+(() => {
+  const still = matchMedia("(prefers-reduced-motion: reduce)");
+  const small = matchMedia("(max-width: 860px)");
+  const root = document.documentElement;
+
+  /* ---------- la firma: nome e mestiere viaggiano con la pagina ---------- */
+  const EMAIL = "info@mixdigital.it";
+  const CATS = {
+    parrucchiere: { label: "Parrucchiere", q: "parrucchiere vicino a me", img: "assets/foto/parrucchiera.jpg", claim: "Tagli, colore e piega su appuntamento", cta: "Prenota online", k: "Orari", v: "mar-sab 9-19", color: "#7a3e1d" },
+    trattoria: { label: "Trattoria", q: "trattoria vicino a me", img: "assets/foto/trattoria.jpg", claim: "Cucina di casa, a pranzo e a cena", cta: "Prenota un tavolo", k: "Aperti", v: "pranzo e cena", color: "#3f5a2a" },
+    forno: { label: "Forno", q: "forno pane fresco vicino a me", img: "assets/foto/forno.jpg", claim: "Pane e focacce ogni mattina", cta: "Ordina per domani", k: "Aperti", v: "lun-sab 7-19", color: "#8a5a12" }
+  };
+  let cat = "parrucchiere";
+  const nameIn = document.getElementById("f-name");
+  const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "").slice(0, 28) || "latuaattivita";
+  function mailHref(n) {
+    const body = ["Ciao, vorrei vedere la bozza del sito per la mia attività.", "", "Nome attività: " + n, "Tipo: " + CATS[cat].label, "Città: ", "Instagram, Facebook o scheda Google: ", ""].join("\n");
+    return "mailto:" + EMAIL + "?subject=" + encodeURIComponent("Vorrei la bozza del mio sito" + (n ? " - " + n : "")) + "&body=" + encodeURIComponent(body);
+  }
+  function render() {
+    const raw = nameIn.value.trim(), n = raw || "La tua attività", c = CATS[cat];
+    document.querySelectorAll("[data-name]").forEach((el) => (el.textContent = raw ? n : (el.closest(".who") ? "la tua attività" : n)));
+    document.querySelectorAll("[data-handle]").forEach((el) => (el.textContent = slug(raw)));
+    document.querySelectorAll("[data-url]").forEach((el) => (el.textContent = slug(raw) + ".it"));
+    document.querySelectorAll("[data-q]").forEach((el) => (el.textContent = c.q));
+    document.querySelectorAll("[data-claim]").forEach((el) => (el.textContent = c.claim));
+    document.querySelectorAll("[data-cta]").forEach((el) => (el.textContent = c.cta));
+    document.querySelectorAll("[data-k]").forEach((el) => (el.textContent = c.k));
+    document.querySelectorAll("[data-v]").forEach((el) => (el.textContent = c.v));
+    document.querySelectorAll("[data-cat-img]").forEach((el) => { if (!el.src.endsWith(c.img)) el.src = c.img; });
+    root.style.setProperty("--cat-color", c.color);
+    document.querySelectorAll("[data-mail]").forEach((a) => (a.href = mailHref(raw)));
+  }
+  document.querySelectorAll("[data-cat]").forEach((b) => b.addEventListener("click", () => {
+    cat = b.dataset.cat;
+    document.querySelectorAll("[data-cat]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    render();
+  }));
+  nameIn.addEventListener("input", render);
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    const out = document.querySelector(".close .copied");
+    try { await navigator.clipboard.writeText(EMAIL); out.textContent = "Copiato: " + EMAIL + ". Incollalo nella tua app di posta."; }
+    catch { out.textContent = "Scrivici a " + EMAIL; }
+  }));
+  document.getElementById("anno").textContent = new Date().getFullYear();
+  render();
+
+  /* ---------- il divisorio: avanzamento e collasso finale ---------- */
+  const close = document.querySelector(".close");
+  const ease = (x) => x * x * (3 - 2 * x);
+  function chrome() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    root.style.setProperty("--prog", max > 0 ? (scrollY / max).toFixed(4) : 0);
+    if (small.matches) { root.style.setProperty("--split", 0); return; }
+    const r = close.getBoundingClientRect();
+    const travel = Math.max(r.height - innerHeight, 1);
+    const p = Math.min(Math.max(-r.top / travel, 0), 1);          // avanzamento dell'atto finale
+    const k = ease(Math.min(Math.max((p - 0.08) / 0.55, 0), 1));   // il collasso
+    root.style.setProperty("--split", (0.5 * (1 - k)).toFixed(4));
+  }
+  addEventListener("scroll", chrome, { passive: true });
+  addEventListener("resize", chrome);
+  small.addEventListener("change", chrome);
+  chrome();
+
+  /* ---------- il lato vivo: campo oro e blu in WebGL, solo a destra del divisorio ---------- */
+  const cv = document.getElementById("alive");
+  const gl = cv.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" });
+  if (gl) {
+    const vs = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
+    const fs = `precision mediump float;
+      uniform vec2 r; uniform float t; uniform vec2 m; uniform float s; uniform float sp;
+      float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float n(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);
+        return mix(mix(h(i),h(i+vec2(1.,0.)),u.x),mix(h(i+vec2(0.,1.)),h(i+1.),u.x),u.y);}
+      float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}
+      void main(){
+        vec2 uv=gl_FragCoord.xy/r;
+        vec2 p=uv*vec2(r.x/r.y,1.)*1.4+vec2(0.,s*.3);
+        float tt=t*.03;
+        vec2 q=vec2(fbm(p+tt),fbm(p+vec2(5.2,1.3)-tt));
+        vec2 w=vec2(fbm(p+3.*q+vec2(1.7,9.2)+tt*1.4),fbm(p+3.*q+vec2(8.3,2.8)-tt));
+        float f=fbm(p+3.*w);
+        vec3 c=mix(vec3(.047,.047,.05),vec3(.141,.2,.561),smoothstep(.45,.92,f)*.62);
+        c=mix(c,vec3(.882,.675,.063),smoothstep(.6,.96,w.y*f*1.7)*.34);
+        c+=vec3(.882,.675,.063)*.06*smoothstep(.45,0.,distance(uv*vec2(r.x/r.y,1.),m*vec2(r.x/r.y,1.)));
+        c*=.6;
+        c+=(h(gl_FragCoord.xy+fract(t))-.5)*.025;
+        float edge=smoothstep(sp-.002,sp+.004,uv.x);         /* a sinistra del divisorio: niente */
+        gl_FragColor=vec4(mix(vec3(.098,.098,.11),c,edge),1.);
+      }`;
+    const sh = (ty, src) => { const o = gl.createShader(ty); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+    const pr = gl.createProgram();
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr);
+    if (gl.getProgramParameter(pr, gl.LINK_STATUS)) {
+      gl.useProgram(pr);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      const U = (k) => gl.getUniformLocation(pr, k);
+      const uR = U("r"), uT = U("t"), uM = U("m"), uS = U("s"), uSp = U("sp");
+      const scale = Math.min(devicePixelRatio || 1, 1.5) * 0.5;
+      let mx = .75, my = .55, tx = .75, ty = .55, raf = 0; const t0 = performance.now();
+      const size = () => { cv.width = Math.round(innerWidth * scale); cv.height = Math.round(innerHeight * scale); gl.viewport(0, 0, cv.width, cv.height); };
+      const draw = (now) => {
+        mx += (tx - mx) * .05; my += (ty - my) * .05;
+        gl.uniform2f(uR, cv.width, cv.height); gl.uniform1f(uT, (now - t0) / 1000);
+        gl.uniform2f(uM, mx, my); gl.uniform1f(uS, scrollY / innerHeight);
+        gl.uniform1f(uSp, parseFloat(getComputedStyle(root).getPropertyValue("--split")) || 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        if (!still.matches && !document.hidden) raf = requestAnimationFrame(draw);
+      };
+      const go = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
+      size(); go();
+      addEventListener("resize", () => { size(); go(); });
+      addEventListener("pointermove", (e) => { tx = e.clientX / innerWidth; ty = 1 - e.clientY / innerHeight; }, { passive: true });
+      addEventListener("scroll", () => { if (still.matches) go(); }, { passive: true });
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) go(); });
+      still.addEventListener("change", go);
+    }
+  }
+
+  ScrollCraft.mount(document.body);
+})();
+</script>
+</body>
+</html>
